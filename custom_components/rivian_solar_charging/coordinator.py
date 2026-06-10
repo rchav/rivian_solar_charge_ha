@@ -83,6 +83,7 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
         self._current_amps: int = 0
         self._charging_state: ChargingState = ChargingState.IDLE
         self.charge_now: bool = False  # set by the Charge Now switch
+        self._schedule_initialized: bool = False  # have we ever asserted control of the schedule?
 
         interval_seconds = config.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
         super().__init__(
@@ -267,7 +268,21 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
                         self._charging_state = ChargingState.IDLE
 
         # --- 7. Apply if changed ---
-        if not skip_reason and new_amps != self._current_amps:
+        needs_apply = not skip_reason and new_amps != self._current_amps
+        if (
+            not needs_apply
+            and not self._schedule_initialized
+            and plugged_in
+            and vehicle_at_home
+            and not self.charge_now
+        ):
+            # First run with the car plugged in at home: assert control of the
+            # schedule even if the computed target matches the default 0A
+            # state, otherwise the car keeps charging on its existing/default
+            # schedule (typically full speed) until we go ACTIVE.
+            needs_apply = True
+
+        if needs_apply:
             await self._apply_amps(vehicle_id, new_amps)
 
         return {
@@ -299,6 +314,7 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
             if success:
                 _LOGGER.info("Schedule updated: %dA → %dA", self._current_amps, amps)
                 self._current_amps = amps
+                self._schedule_initialized = True
             else:
                 _LOGGER.warning("set_charging_schedule returned failure")
         except Exception as err:  # noqa: BLE001

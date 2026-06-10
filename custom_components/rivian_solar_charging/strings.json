@@ -1,0 +1,60 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Rivian Account",
+        "description": "Enter your Rivian account credentials.",
+        "data": {
+          "email": "Email",
+          "password": "Password"
+        }
+      },
+      "mfa": {
+        "title": "Two-Factor Authentication",
+        "description": "Rivian sent a one-time code to {email}. Enter it below.",
+        "data": {
+          "otp_code": "OTP Code"
+        }
+      },
+      "vehicle": {
+        "title": "Vehicle & Entities",
+        "description": "Configure your vehicle and Home Assistant power entities.",
+        "data": {
+          "vehicle_id": "Rivian Vehicle ID (find it in the Rivian app or via Developer Tools → States)",
+          "powerwall_entity": "Powerwall % charged entity",
+          "grid_power_entity": "Grid power entity (negative = exporting to grid)",
+          "home_latitude": "Home latitude (auto-filled from HA home zone)",
+          "home_longitude": "Home longitude",
+          "scan_interval": "Poll interval in seconds (default 300 = 5 min)",
+          "charge_limit": "Stop solar-charging Rivian above this % (default 90)",
+          "powerwall_min_pct": "Powerwall % to START diverting solar to car (default 100)",
+          "powerwall_stop_pct": "Powerwall % to STOP diverting — hysteresis floor (default 70)",
+          "rivian_start_limit": "Don't start a new session if Rivian is already above this % (default 80)"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid Rivian credentials. Check your email and password.",
+      "invalid_otp": "Incorrect OTP code. Try again.",
+      "cannot_connect": "Cannot reach Rivian servers. Check your network connection.",
+      "entity_not_found": "Entity not found in Home Assistant. Check the entity ID."
+    },
+    "abort": {
+      "already_configured": "This Rivian account is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Solar Charging Options",
+        "data": {
+          "scan_interval": "Poll interval (seconds)",
+          "charge_limit": "Rivian charge target %",
+          "powerwall_min_pct": "Powerwall START threshold %",
+          "powerwall_stop_pct": "Powerwall STOP threshold % (hysteresis floor)",
+          "rivian_start_limit": "Rivian % above which new sessions won't start"
+        }
+      }
+    }
+  }
+}

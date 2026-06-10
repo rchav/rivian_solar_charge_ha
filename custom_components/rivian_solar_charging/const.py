@@ -1,0 +1,48 @@
+"""Constants for the Rivian Solar Charging integration."""
+
+DOMAIN = "rivian_solar_charging"
+
+# Config entry keys
+CONF_EMAIL = "email"
+CONF_PASSWORD = "password"
+CONF_VEHICLE_ID = "vehicle_id"
+CONF_GRID_POWER_ENTITY = "grid_power_entity"
+CONF_POWERWALL_ENTITY = "powerwall_entity"
+CONF_HOME_LAT = "home_latitude"
+CONF_HOME_LNG = "home_longitude"
+CONF_SCAN_INTERVAL = "scan_interval"
+CONF_CHARGE_LIMIT = "charge_limit"
+CONF_BATTERY_LIMIT = "powerwall_min_pct"
+CONF_POWERWALL_STOP_PCT = "powerwall_stop_pct"
+CONF_RIVIAN_START_LIMIT = "rivian_start_limit"
+
+# Stored session tokens
+CONF_CSRF_TOKEN = "csrf_token"
+CONF_APP_SESSION = "app_session"
+CONF_USER_SESSION = "user_session"
+CONF_REFRESH_TOKEN = "refresh_token"
+CONF_OTP_TOKEN = "otp_token"
+
+# Defaults
+DEFAULT_SCAN_INTERVAL = 300
+DEFAULT_CHARGE_LIMIT = 90
+DEFAULT_POWERWALL_MIN_PCT = 100
+DEFAULT_POWERWALL_STOP_PCT = 70
+DEFAULT_RIVIAN_START_LIMIT = 80
+
+# Rivian on-board AC charger limits
+MIN_AMPS = 8
+MAX_AMPS = 48
+VOLTAGE = 240
+
+# Dead-band: don't change amps unless delta exceeds this
+DEADBAND_AMPS = 2
+
+# How close the car must be to home (km) to allow schedule updates
+HOME_RADIUS_KM = 0.5
+
+# Minutes before sunset to stop solar charging
+SUNSET_CUTOFF_MINUTES = 30
+
+# Key used to signal "charge now" mode from the switch platform
+CHARGE_NOW_KEY = "charge_now"

@@ -1,6 +1,7 @@
 # Rivian Solar Charging — Home Assistant Integration
 
 Automatically charges your Rivian EV using excess solar power, after your home battery reaches 100%. Dynamically adjusts the Rivian on-board charger amperage every 5 minutes (configurable) so that solar surplus goes into the car instead of back to the grid.
+<img width="2149" height="1104" alt="image" src="https://github.com/user-attachments/assets/9800010e-3bac-4068-8869-c6165e27db45" />
 
 ---
 

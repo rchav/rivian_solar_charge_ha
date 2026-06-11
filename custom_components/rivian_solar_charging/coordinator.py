@@ -272,14 +272,15 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
         if (
             not needs_apply
             and not self._schedule_initialized
-            and plugged_in
             and vehicle_at_home
             and not self.charge_now
         ):
-            # First run with the car plugged in at home: assert control of the
+            # First run while the car is at home: assert control of the
             # schedule even if the computed target matches the default 0A
-            # state, otherwise the car keeps charging on its existing/default
-            # schedule (typically full speed) until we go ACTIVE.
+            # state and even if the car isn't plugged in yet. The Rivian
+            # schedule persists independent of plug state, so if we don't
+            # write it now, the car will honor its stale (often full-speed)
+            # schedule the instant it gets plugged in.
             needs_apply = True
 
         if needs_apply:

@@ -196,6 +196,13 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
         new_amps = self._current_amps
         skip_reason: str | None = None
 
+        # If Charge Now was just cancelled (switch turned off), hand control
+        # back to the solar state machine and drop the forced MAX_AMPS
+        # schedule so it doesn't keep charging at full speed.
+        if not self.charge_now and self._charging_state == ChargingState.CHARGE_NOW:
+            self._charging_state = ChargingState.IDLE
+            new_amps = 0
+
         # --- 4. CHARGE NOW mode ---
         if self.charge_now:
             if not plugged_in:
@@ -275,13 +282,12 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
                         _LOGGER.info("Ramp-down complete")
                         self._charging_state = ChargingState.IDLE
 
-        # --- 6.5 Label "active but nothing to divert right now" ---
-        if (
-            skip_reason is None
-            and self._charging_state == ChargingState.ACTIVE
-            and new_amps == 0
-        ):
+        # --- 6.5 Label states that aren't actively "skipping" but have no
+        # explicit reason set above ---
+        if skip_reason is None and self._charging_state == ChargingState.ACTIVE and new_amps == 0:
             skip_reason = "no_solar_surplus"
+        elif skip_reason is None and self._charging_state == ChargingState.RAMPDOWN:
+            skip_reason = "ramping_down"
 
         # --- 7. Apply if changed ---
         # Note: deliberately NOT gated on `not skip_reason` — the hard-stop

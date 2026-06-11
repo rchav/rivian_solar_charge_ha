@@ -69,7 +69,6 @@ class RivianSolarSwitch(CoordinatorEntity, SwitchEntity):
                 amperage=0,
                 latitude=config[CONF_HOME_LAT],
                 longitude=config[CONF_HOME_LNG],
-                enabled=False,
             )
             self.coordinator._current_amps = 0  # noqa: SLF001
             _LOGGER.info("Solar charging disabled")

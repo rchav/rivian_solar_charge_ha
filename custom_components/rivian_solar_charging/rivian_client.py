@@ -9,6 +9,7 @@ Inspired by: https://github.com/ostap-korkuna/rivian-charging-automation
 from __future__ import annotations
 
 import logging
+from datetime import datetime
 from typing import Any
 
 import aiohttp
@@ -222,28 +223,45 @@ class RivianClient:
         amperage: int,
         latitude: float,
         longitude: float,
-        enabled: bool = True,
     ) -> bool:
         """Set a charging schedule to the given amperage.
 
-        Uses an all-day, all-week schedule so the car accepts power immediately.
-        Amperage of 0 → enabled=False (schedule present but disabled).
+        To charge, uses an all-day, all-week schedule so the car accepts
+        power immediately at `amperage`.
+
+        To stop (amperage <= 0), Rivian's `enabled: false` does NOT pause
+        charging — with no active schedule the car charges immediately at
+        full power as soon as it's plugged in. So instead we keep the
+        schedule enabled but point its time window at a 1-hour slot in the
+        opposite half of the day, which never covers "now".
+
         Returns True on success.
         """
-        if amperage <= 0:
-            enabled = False
+        week_days = [
+            "Monday", "Tuesday", "Wednesday",
+            "Thursday", "Friday", "Saturday", "Sunday",
+        ]
+        location = {"latitude": latitude, "longitude": longitude}
 
-        schedule = {
-            "weekDays": [
-                "Monday", "Tuesday", "Wednesday",
-                "Thursday", "Friday", "Saturday", "Sunday",
-            ],
-            "startTime": 0,
-            "duration": 1440,
-            "location": {"latitude": latitude, "longitude": longitude},
-            "amperage": max(8, amperage) if enabled else 8,
-            "enabled": enabled,
-        }
+        if amperage > 0:
+            schedule = {
+                "weekDays": week_days,
+                "startTime": 0,
+                "duration": 1440,
+                "location": location,
+                "amperage": max(8, amperage),
+                "enabled": True,
+            }
+        else:
+            current_hour = datetime.now().hour
+            schedule = {
+                "weekDays": week_days,
+                "startTime": (18 if current_hour < 12 else 6) * 60,
+                "duration": 60,
+                "location": location,
+                "amperage": 8,
+                "enabled": True,
+            }
         payload = {
             "operationName": "SetChargingSchedule",
             "variables": {

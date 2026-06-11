@@ -310,7 +310,6 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
                 amperage=amps,
                 latitude=self.config[CONF_HOME_LAT],
                 longitude=self.config[CONF_HOME_LNG],
-                enabled=amps > 0,
             )
             if success:
                 _LOGGER.info("Schedule updated: %dA → %dA", self._current_amps, amps)

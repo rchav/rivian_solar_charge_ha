@@ -1,7 +1,7 @@
 {
   "domain": "rivian_solar_charging",
   "name": "Rivian Solar Charging",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "documentation": "https://github.com/yourusername/rivian-solar-charging-ha",
   "dependencies": [],
   "codeowners": [],

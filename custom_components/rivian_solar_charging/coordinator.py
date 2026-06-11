@@ -19,6 +19,7 @@ from datetime import datetime, timedelta
 from enum import Enum
 from typing import Any
 
+from homeassistant.const import UnitOfPower
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.sun import get_astral_event_date
@@ -62,6 +63,14 @@ class ChargingState(str, Enum):
     ACTIVE = "active"
     RAMPDOWN = "rampdown"
     CHARGE_NOW = "charge_now"
+
+
+def _state_to_watts(state) -> float:
+    """Parse a power entity's state, converting kW to W if needed."""
+    value = float(state.state)
+    if state.attributes.get("unit_of_measurement") == UnitOfPower.KILO_WATT:
+        value *= 1000
+    return value
 
 
 def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -168,7 +177,7 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
         if grid_state is None:
             raise UpdateFailed(f"Entity {grid_entity} not found")
         try:
-            grid_watts = float(grid_state.state)
+            grid_watts = _state_to_watts(grid_state)
         except ValueError as err:
             raise UpdateFailed(f"Cannot parse {grid_entity}: {grid_state.state}") from err
 
@@ -186,7 +195,7 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
             pw_power_state = self.hass.states.get(pw_power_entity)
             if pw_power_state is not None:
                 try:
-                    powerwall_charging_watts = max(0.0, -float(pw_power_state.state))
+                    powerwall_charging_watts = max(0.0, -_state_to_watts(pw_power_state))
                 except ValueError:
                     powerwall_charging_watts = 0.0
 
@@ -358,12 +367,20 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
                 self._off_window_start_minutes = None
             await self._apply_amps(vehicle_id, new_amps, off_start_minutes)
 
+        # While IDLE, the Powerwall hasn't reached its start threshold yet,
+        # so none of `available_watts` is actually being diverted — it's
+        # still going toward charging the Powerwall. Report 0 rather than
+        # implying that power is available to the car right now.
+        displayed_available_watts = (
+            0.0 if self._charging_state == ChargingState.IDLE else available_watts
+        )
+
         return {
             "powerwall_pct": powerwall_pct,
             "grid_watts": grid_watts,
             "export_watts": export_watts,
             "powerwall_charging_watts": powerwall_charging_watts,
-            "available_watts": available_watts,
+            "available_watts": displayed_available_watts,
             "plugged_in": plugged_in,
             "battery_level": battery_level,
             "battery_limit": battery_limit,

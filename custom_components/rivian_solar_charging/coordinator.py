@@ -331,6 +331,10 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
             skip_reason = "no_solar_surplus"
         elif skip_reason is None and self._charging_state == ChargingState.RAMPDOWN:
             skip_reason = "ramping_down"
+        elif skip_reason is None and self._charging_state == ChargingState.CHARGE_NOW:
+            skip_reason = "charge_now"
+        elif skip_reason is None:
+            skip_reason = "charging"
 
         # --- 7. Apply if changed ---
         # Note: deliberately NOT gated on `not skip_reason` — the hard-stop

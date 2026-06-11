@@ -47,6 +47,8 @@ from .const import (
     HOME_RADIUS_KM,
     MAX_AMPS,
     MIN_AMPS,
+    OFF_SCHEDULE_LEAD_MINUTES,
+    OFF_SCHEDULE_REFRESH_MARGIN_MINUTES,
     SUNSET_CUTOFF_MINUTES,
     VOLTAGE,
 )
@@ -86,6 +88,10 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
         self._charging_state: ChargingState = ChargingState.IDLE
         self.charge_now: bool = False  # set by the Charge Now switch
         self._schedule_initialized: bool = False  # have we ever asserted control of the schedule?
+        # Minutes-since-midnight of the start of the currently-applied
+        # "off" blackout window, or None if charging is currently active
+        # (and the window therefore needs recomputing once it stops).
+        self._off_window_start_minutes: int | None = None
 
         self.device_info = DeviceInfo(
             identifiers={(DOMAIN, config[CONF_VEHICLE_ID])},
@@ -133,6 +139,13 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
         if amps <= 0:
             return 0
         return max(MIN_AMPS, min(MAX_AMPS, amps))
+
+    def _off_window_due(self, now_minutes: int) -> bool:
+        """Whether the "off" blackout window needs to be (re)pushed further out."""
+        if self._off_window_start_minutes is None:
+            return True
+        minutes_until_start = (self._off_window_start_minutes - now_minutes) % 1440
+        return minutes_until_start <= OFF_SCHEDULE_REFRESH_MARGIN_MINUTES
 
     # ------------------------------------------------------------------
     # Main update loop
@@ -317,7 +330,11 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
         # "actively stop charging now". The skip-with-no-op branches
         # (waiting_for_solar, away_from_home) never change new_amps, so they
         # remain no-ops here regardless.
-        needs_apply = new_amps != self._current_amps
+        now = datetime.now()
+        now_minutes = now.hour * 60 + now.minute
+        off_window_due = new_amps == 0 and self._off_window_due(now_minutes)
+
+        needs_apply = new_amps != self._current_amps or off_window_due
         if (
             not needs_apply
             and not self._schedule_initialized
@@ -333,7 +350,13 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
             needs_apply = True
 
         if needs_apply:
-            await self._apply_amps(vehicle_id, new_amps)
+            off_start_minutes: int | None = None
+            if new_amps == 0:
+                off_start_minutes = (now_minutes + OFF_SCHEDULE_LEAD_MINUTES) % 1440
+                self._off_window_start_minutes = off_start_minutes
+            else:
+                self._off_window_start_minutes = None
+            await self._apply_amps(vehicle_id, new_amps, off_start_minutes)
 
         return {
             "powerwall_pct": powerwall_pct,
@@ -354,13 +377,16 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
             "charge_now": self.charge_now,
         }
 
-    async def _apply_amps(self, vehicle_id: str, amps: int) -> None:
+    async def _apply_amps(
+        self, vehicle_id: str, amps: int, off_start_minutes: int | None = None
+    ) -> None:
         try:
             success = await self.rivian.set_charging_schedule(
                 vehicle_id=vehicle_id,
                 amperage=amps,
                 latitude=self.config[CONF_HOME_LAT],
                 longitude=self.config[CONF_HOME_LNG],
+                off_start_minutes=off_start_minutes,
             )
             if success:
                 _LOGGER.info("Schedule updated: %dA → %dA", self._current_amps, amps)

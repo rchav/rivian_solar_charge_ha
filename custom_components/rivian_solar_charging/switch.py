@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
@@ -18,6 +18,7 @@ from .const import (
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
     MAX_AMPS,
+    OFF_SCHEDULE_LEAD_MINUTES,
 )
 from .coordinator import SolarChargingCoordinator
 
@@ -65,13 +66,17 @@ class RivianSolarSwitch(CoordinatorEntity, SwitchEntity):
         self.coordinator.update_interval = None
         config = self.coordinator.config
         try:
+            now = datetime.now()
+            off_start_minutes = (now.hour * 60 + now.minute + OFF_SCHEDULE_LEAD_MINUTES) % 1440
             await self.coordinator.rivian.set_charging_schedule(
                 vehicle_id=config[CONF_VEHICLE_ID],
                 amperage=0,
                 latitude=config[CONF_HOME_LAT],
                 longitude=config[CONF_HOME_LNG],
+                off_start_minutes=off_start_minutes,
             )
             self.coordinator._current_amps = 0  # noqa: SLF001
+            self.coordinator._off_window_start_minutes = off_start_minutes  # noqa: SLF001
             _LOGGER.info("Solar charging disabled")
         except Exception as err:  # noqa: BLE001
             _LOGGER.error("Failed to disable charging: %s", err)

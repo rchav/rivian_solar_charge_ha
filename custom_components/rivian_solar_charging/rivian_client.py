@@ -223,6 +223,7 @@ class RivianClient:
         amperage: int,
         latitude: float,
         longitude: float,
+        off_start_minutes: int | None = None,
     ) -> bool:
         """Set a charging schedule to the given amperage.
 
@@ -232,8 +233,10 @@ class RivianClient:
         To stop (amperage <= 0), Rivian's `enabled: false` does NOT pause
         charging — with no active schedule the car charges immediately at
         full power as soon as it's plugged in. So instead we keep the
-        schedule enabled but point its time window at a 1-hour slot in the
-        opposite half of the day, which never covers "now".
+        schedule enabled but point its time window at a 1-hour slot that
+        doesn't cover "now". `off_start_minutes` (minutes since midnight)
+        is provided by the coordinator, which periodically pushes this
+        window further into the future so it never actually arrives.
 
         Returns True on success.
         """
@@ -253,10 +256,12 @@ class RivianClient:
                 "enabled": True,
             }
         else:
-            current_hour = datetime.now().hour
+            if off_start_minutes is None:
+                current_hour = datetime.now().hour
+                off_start_minutes = (18 if current_hour < 12 else 6) * 60
             schedule = {
                 "weekDays": week_days,
-                "startTime": (18 if current_hour < 12 else 6) * 60,
+                "startTime": off_start_minutes,
                 "duration": 60,
                 "location": location,
                 "amperage": 8,

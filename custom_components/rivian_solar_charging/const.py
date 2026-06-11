@@ -45,5 +45,16 @@ HOME_RADIUS_KM = 0.5
 # Minutes before sunset to stop solar charging
 SUNSET_CUTOFF_MINUTES = 30
 
+# When charging should be "off", Rivian still requires an enabled schedule
+# (see rivian_client.set_charging_schedule) — its 1-hour window is placed
+# this many minutes ahead of "now" so it doesn't trigger immediately. That
+# window is re-pushed further into the future once it gets within
+# OFF_SCHEDULE_REFRESH_MARGIN_MINUTES of starting, so a static window never
+# actually arrives and starts an unwanted charge session. The margin must
+# be comfortably larger than the scan interval so a poll always catches the
+# window before it becomes active.
+OFF_SCHEDULE_LEAD_MINUTES = 12 * 60
+OFF_SCHEDULE_REFRESH_MARGIN_MINUTES = 60
+
 # Key used to signal "charge now" mode from the switch platform
 CHARGE_NOW_KEY = "charge_now"

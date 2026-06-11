@@ -268,7 +268,13 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
                         self._charging_state = ChargingState.IDLE
 
         # --- 7. Apply if changed ---
-        needs_apply = not skip_reason and new_amps != self._current_amps
+        # Note: deliberately NOT gated on `not skip_reason` — the hard-stop
+        # branches above (after_sunset_cutoff, not_plugged_in,
+        # rivian_at_charge_limit) set skip_reason *and* new_amps=0 to signal
+        # "actively stop charging now". The skip-with-no-op branches
+        # (waiting_for_solar, away_from_home) never change new_amps, so they
+        # remain no-ops here regardless.
+        needs_apply = new_amps != self._current_amps
         if (
             not needs_apply
             and not self._schedule_initialized

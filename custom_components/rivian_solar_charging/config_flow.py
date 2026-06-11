@@ -24,6 +24,7 @@ from .const import (
     CONF_HOME_LNG,
     CONF_PASSWORD,
     CONF_POWERWALL_ENTITY,
+    CONF_POWERWALL_POWER_ENTITY,
     CONF_POWERWALL_STOP_PCT,
     CONF_RIVIAN_START_LIMIT,
     CONF_SCAN_INTERVAL,
@@ -165,6 +166,11 @@ class RivianSolarChargingConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     ): selector.EntitySelector(
                     selector.EntitySelectorConfig(domain="sensor")
                 ),
+                vol.Optional(
+                    CONF_POWERWALL_POWER_ENTITY,
+                    ): selector.EntitySelector(
+                    selector.EntitySelectorConfig(domain="sensor")
+                ),
                 vol.Required(CONF_HOME_LAT, default=default_lat): vol.Coerce(float),
                 vol.Required(CONF_HOME_LNG, default=default_lng): vol.Coerce(float),
                 vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL): vol.All(
@@ -210,6 +216,12 @@ class RivianSolarOptionsFlow(config_entries.OptionsFlow):
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema({
+                vol.Optional(
+                    CONF_POWERWALL_POWER_ENTITY,
+                    description={"suggested_value": d.get(CONF_POWERWALL_POWER_ENTITY)},
+                ): selector.EntitySelector(
+                    selector.EntitySelectorConfig(domain="sensor")
+                ),
                 vol.Optional(CONF_SCAN_INTERVAL,
                     default=d.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
                 ): vol.All(vol.Coerce(int), vol.Range(min=60, max=3600)),

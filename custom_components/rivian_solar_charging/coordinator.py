@@ -32,6 +32,7 @@ from .const import (
     CONF_HOME_LAT,
     CONF_HOME_LNG,
     CONF_POWERWALL_ENTITY,
+    CONF_POWERWALL_POWER_ENTITY,
     CONF_POWERWALL_STOP_PCT,
     CONF_RIVIAN_START_LIMIT,
     CONF_SCAN_INTERVAL,
@@ -160,6 +161,24 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
 
         export_watts = -grid_watts
 
+        # --- 2.5 Read Powerwall battery power (optional) ---
+        # Sign convention: positive = discharging, negative = charging
+        # (absorbing solar). Once active, treat power the Powerwall is
+        # currently absorbing as available to redirect to the car too —
+        # otherwise a start % below 100 never actually diverts anything,
+        # since all solar goes to the Powerwall until it's full.
+        powerwall_charging_watts = 0.0
+        pw_power_entity = self.config.get(CONF_POWERWALL_POWER_ENTITY)
+        if pw_power_entity:
+            pw_power_state = self.hass.states.get(pw_power_entity)
+            if pw_power_state is not None:
+                try:
+                    powerwall_charging_watts = max(0.0, -float(pw_power_state.state))
+                except ValueError:
+                    powerwall_charging_watts = 0.0
+
+        available_watts = export_watts + powerwall_charging_watts
+
         # --- 3. Read Rivian vehicle state ---
         vehicle_id = self.config[CONF_VEHICLE_ID]
         try:
@@ -185,9 +204,11 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
         after_sunset = self._is_after_sunset_cutoff()
 
         _LOGGER.debug(
-            "Poll — PW: %.0f%% | Grid: %+.0fW | Rivian: soc=%.1f%% plugged=%s "
+            "Poll — PW: %.0f%% | Grid: %+.0fW | PW charging: %+.0fW | "
+            "Available: %+.0fW | Rivian: soc=%.1f%% plugged=%s "
             "at_home=%s dist=%.2fkm | sunset=%s charge_now=%s | state=%s amps=%dA",
-            powerwall_pct, grid_watts, battery_level, plugged_in,
+            powerwall_pct, grid_watts, powerwall_charging_watts, available_watts,
+            battery_level, plugged_in,
             vehicle_at_home, distance_km or 0,
             after_sunset, self.charge_now,
             self._charging_state.value, self._current_amps,
@@ -253,7 +274,7 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
                         powerwall_pct, pw_start_pct,
                     )
                     self._charging_state = ChargingState.ACTIVE
-                    new_amps = self._clamp_amps(math.floor(export_watts / VOLTAGE))
+                    new_amps = self._clamp_amps(math.floor(available_watts / VOLTAGE))
                 else:
                     skip_reason = skip_reason or "waiting_for_solar"
 
@@ -266,7 +287,7 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
                     self._charging_state = ChargingState.RAMPDOWN
                     new_amps = self._clamp_amps(self._current_amps - MIN_AMPS)
                 else:
-                    delta = math.floor(export_watts / VOLTAGE)
+                    delta = math.floor(available_watts / VOLTAGE)
                     if abs(delta) <= DEADBAND_AMPS:
                         delta = 0
                     new_amps = self._clamp_amps(self._current_amps + delta)
@@ -275,7 +296,7 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
                 if powerwall_pct >= pw_start_pct:
                     _LOGGER.info("PW recovered to %.0f%% — resuming", powerwall_pct)
                     self._charging_state = ChargingState.ACTIVE
-                    new_amps = self._clamp_amps(math.floor(export_watts / VOLTAGE))
+                    new_amps = self._clamp_amps(math.floor(available_watts / VOLTAGE))
                 elif self._current_amps > 0:
                     new_amps = self._clamp_amps(self._current_amps - MIN_AMPS)
                     if new_amps == 0:
@@ -318,6 +339,8 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
             "powerwall_pct": powerwall_pct,
             "grid_watts": grid_watts,
             "export_watts": export_watts,
+            "powerwall_charging_watts": powerwall_charging_watts,
+            "available_watts": available_watts,
             "plugged_in": plugged_in,
             "battery_level": battery_level,
             "battery_limit": battery_limit,

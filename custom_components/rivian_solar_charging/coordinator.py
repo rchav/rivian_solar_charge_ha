@@ -20,6 +20,7 @@ from enum import Enum
 from typing import Any
 
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.sun import get_astral_event_date
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
@@ -84,6 +85,13 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
         self._charging_state: ChargingState = ChargingState.IDLE
         self.charge_now: bool = False  # set by the Charge Now switch
         self._schedule_initialized: bool = False  # have we ever asserted control of the schedule?
+
+        self.device_info = DeviceInfo(
+            identifiers={(DOMAIN, config[CONF_VEHICLE_ID])},
+            name="Rivian Solar Charging",
+            manufacturer="Rivian",
+            model="Solar Charging Automation",
+        )
 
         interval_seconds = config.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
         super().__init__(

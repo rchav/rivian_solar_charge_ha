@@ -44,6 +44,7 @@ class RivianSolarSwitch(CoordinatorEntity, SwitchEntity):
         self._attr_unique_id = f"{entry_id}_solar_charging_enabled"
         self._attr_name = "Rivian Solar Charging"
         self._attr_icon = "mdi:solar-power"
+        self._attr_device_info = coordinator.device_info
         self._enabled = True
 
     @property
@@ -89,6 +90,7 @@ class RivianChargeNowSwitch(CoordinatorEntity, SwitchEntity):
         self._attr_unique_id = f"{entry_id}_charge_now"
         self._attr_name = "Rivian Charge Now"
         self._attr_icon = "mdi:lightning-bolt"
+        self._attr_device_info = coordinator.device_info
 
     @property
     def is_on(self) -> bool:

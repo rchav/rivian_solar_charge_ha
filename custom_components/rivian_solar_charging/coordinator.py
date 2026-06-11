@@ -267,6 +267,14 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
                         _LOGGER.info("Ramp-down complete")
                         self._charging_state = ChargingState.IDLE
 
+        # --- 6.5 Label "active but nothing to divert right now" ---
+        if (
+            skip_reason is None
+            and self._charging_state == ChargingState.ACTIVE
+            and new_amps == 0
+        ):
+            skip_reason = "no_solar_surplus"
+
         # --- 7. Apply if changed ---
         # Note: deliberately NOT gated on `not skip_reason` — the hard-stop
         # branches above (after_sunset_cutoff, not_plugged_in,

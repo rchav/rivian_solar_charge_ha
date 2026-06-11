@@ -51,7 +51,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         except RivianAuthError as err:
             raise ConfigEntryNotReady(f"Rivian auth failed: {err}") from err
 
-    coordinator = SolarChargingCoordinator(hass, client, dict(entry.data))
+    coordinator = SolarChargingCoordinator(hass, client, {**entry.data, **entry.options})
 
     # After first successful API call, persist any refreshed tokens
     await coordinator.async_config_entry_first_refresh()

@@ -36,6 +36,7 @@ from .const import (
     CONF_POWERWALL_POWER_ENTITY,
     CONF_POWERWALL_STOP_PCT,
     CONF_RIVIAN_START_LIMIT,
+    CONF_SAFETY_MARGIN_WATTS,
     CONF_SCAN_INTERVAL,
     CONF_VEHICLE_ID,
     DEADBAND_AMPS,
@@ -43,6 +44,7 @@ from .const import (
     DEFAULT_POWERWALL_MIN_PCT,
     DEFAULT_POWERWALL_STOP_PCT,
     DEFAULT_RIVIAN_START_LIMIT,
+    DEFAULT_SAFETY_MARGIN_WATTS,
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
     HOME_RADIUS_KM,
@@ -199,7 +201,13 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
                 except ValueError:
                     powerwall_charging_watts = 0.0
 
-        available_watts = export_watts + powerwall_charging_watts
+        # Reserve a safety margin so the car targets slightly below the
+        # measured surplus — leaving headroom for other loads in the house
+        # to spin up without pushing the home into grid import.
+        safety_margin_watts = self.config.get(
+            CONF_SAFETY_MARGIN_WATTS, DEFAULT_SAFETY_MARGIN_WATTS
+        )
+        available_watts = export_watts + powerwall_charging_watts - safety_margin_watts
 
         # --- 3. Read Rivian vehicle state ---
         vehicle_id = self.config[CONF_VEHICLE_ID]

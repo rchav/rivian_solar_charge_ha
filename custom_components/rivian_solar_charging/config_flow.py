@@ -27,6 +27,7 @@ from .const import (
     CONF_POWERWALL_POWER_ENTITY,
     CONF_POWERWALL_STOP_PCT,
     CONF_RIVIAN_START_LIMIT,
+    CONF_SAFETY_MARGIN_WATTS,
     CONF_SCAN_INTERVAL,
     CONF_USER_SESSION,
     CONF_VEHICLE_ID,
@@ -34,6 +35,7 @@ from .const import (
     DEFAULT_POWERWALL_MIN_PCT,
     DEFAULT_POWERWALL_STOP_PCT,
     DEFAULT_RIVIAN_START_LIMIT,
+    DEFAULT_SAFETY_MARGIN_WATTS,
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
 )
@@ -188,6 +190,9 @@ class RivianSolarChargingConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Optional(CONF_RIVIAN_START_LIMIT, default=DEFAULT_RIVIAN_START_LIMIT): vol.All(
                     vol.Coerce(int), vol.Range(min=50, max=100)
                 ),
+                vol.Optional(CONF_SAFETY_MARGIN_WATTS, default=DEFAULT_SAFETY_MARGIN_WATTS): vol.All(
+                    vol.Coerce(int), vol.Range(min=0, max=2000)
+                ),
             }),
             errors=errors,
         )
@@ -237,5 +242,8 @@ class RivianSolarOptionsFlow(config_entries.OptionsFlow):
                 vol.Optional(CONF_RIVIAN_START_LIMIT,
                     default=d.get(CONF_RIVIAN_START_LIMIT, DEFAULT_RIVIAN_START_LIMIT)
                 ): vol.All(vol.Coerce(int), vol.Range(min=50, max=100)),
+                vol.Optional(CONF_SAFETY_MARGIN_WATTS,
+                    default=d.get(CONF_SAFETY_MARGIN_WATTS, DEFAULT_SAFETY_MARGIN_WATTS)
+                ): vol.All(vol.Coerce(int), vol.Range(min=0, max=2000)),
             }),
         )

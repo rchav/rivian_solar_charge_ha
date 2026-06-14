@@ -16,6 +16,7 @@ CONF_CHARGE_LIMIT = "charge_limit"
 CONF_BATTERY_LIMIT = "powerwall_min_pct"
 CONF_POWERWALL_STOP_PCT = "powerwall_stop_pct"
 CONF_RIVIAN_START_LIMIT = "rivian_start_limit"
+CONF_SAFETY_MARGIN_WATTS = "safety_margin_watts"
 
 # Stored session tokens
 CONF_CSRF_TOKEN = "csrf_token"
@@ -30,6 +31,7 @@ DEFAULT_CHARGE_LIMIT = 90
 DEFAULT_POWERWALL_MIN_PCT = 100
 DEFAULT_POWERWALL_STOP_PCT = 70
 DEFAULT_RIVIAN_START_LIMIT = 80
+DEFAULT_SAFETY_MARGIN_WATTS = 300
 
 # Rivian on-board AC charger limits
 MIN_AMPS = 8

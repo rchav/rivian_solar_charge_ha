@@ -57,6 +57,7 @@ views:
                   action: none
                 icon_tap_action:
                   action: none
+                features: []
                 visibility:
                   - condition: user
                     users:
@@ -101,6 +102,7 @@ views:
                   action: none
                 icon_tap_action:
                   action: none
+                features: []
                 visibility:
                   - condition: user
                     users:
@@ -139,6 +141,7 @@ views:
                   action: none
                 icon_tap_action:
                   action: none
+                features: []
                 visibility:
                   - condition: user
                     users:
@@ -163,6 +166,7 @@ views:
                   action: none
                 icon_tap_action:
                   action: none
+                features: []
                 visibility:
                   - condition: user
                     users:
@@ -279,6 +283,7 @@ views:
                   action: none
                 icon_tap_action:
                   action: none
+                features: []
                 visibility:
                   - condition: user
                     users:
@@ -303,6 +308,7 @@ views:
                   action: none
                 icon_tap_action:
                   action: none
+                features: []
                 visibility:
                   - condition: user
                     users:
@@ -345,6 +351,7 @@ views:
                   action: none
                 icon_tap_action:
                   action: none
+                features: []
                 visibility:
                   - condition: user
                     users:
@@ -942,6 +949,7 @@ views:
                   action: none
                 icon_tap_action:
                   action: none
+                features: []
                 visibility:
                   - condition: user
                     users:
@@ -987,6 +995,7 @@ views:
                   action: none
                 icon_tap_action:
                   action: none
+                features: []
                 visibility:
                   - condition: user
                     users:
@@ -1290,6 +1299,7 @@ views:
               action: none
             icon_tap_action:
               action: none
+            features: []
             visibility:
               - condition: user
                 users:

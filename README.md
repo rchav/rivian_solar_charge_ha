@@ -19,11 +19,12 @@ Automatically charges your Rivian EV using excess solar power, after your home b
 - Keep charging until battery drops below **70%** (configurable stop threshold)
 - Between 70–100%, hold whatever charging state is already active
 
-**Amp calculation** (same formula as [ostap-korkuna/rivian-charging-automation](https://github.com/ostap-korkuna/rivian-charging-automation)):
+**Amp calculation** (based on [ostap-korkuna/rivian-charging-automation](https://github.com/ostap-korkuna/rivian-charging-automation)):
 ```
-Δ amps = floor(export_watts / 240)
+available_watts = export_watts + powerwall_charging_watts - safety_margin_watts
+Δ amps = floor(available_watts / 240)
 ```
-Dead-band of ±2A prevents constant small adjustments. Clamped to Rivian's on-board charger range: **8–48A** (or 0 = off).
+`powerwall_charging_watts` is the power the Powerwall is currently absorbing (treated as redirectable to the car). `safety_margin_watts` is a configurable buffer (default 300W) that keeps the home from briefly importing grid power when loads spin up. Dead-band of ±2A prevents constant small adjustments. Clamped to Rivian's on-board charger range: **8–48A** (or 0 = off).
 
 **Ramp down** gracefully steps amps down 8A per cycle instead of cutting instantly.
 
@@ -110,12 +111,14 @@ Copy `custom_components/rivian_solar_charging/` into your HA `config/custom_comp
 | Vehicle ID | From the script above (e.g. `01-xxxxxxxxx`) |
 | Powerwall % entity | Your battery SOC sensor |
 | Grid power entity | Grid sensor — **must be negative when exporting** |
+| Powerwall power entity | *(optional)* Powerwall battery power sensor — positive = discharging, negative = charging. Enables treating Powerwall-absorbed solar as available to redirect to the car. |
 | Home lat/lng | Auto-filled from your HA home zone |
 | Poll interval | How often to adjust (default 300s = 5 min) |
 | EV charge target % | Stop solar-charging above this (default 90%) |
 | Powerwall start % | Begin diverting to car when PW reaches this (default 100%) |
 | Powerwall stop % | Stop diverting when PW drops below this (default 70%) |
 | Rivian session start limit | Don't start new session above this Rivian % (default 80%) |
+| Safety margin (W) | Watts reserved as headroom so transient home loads don't cause grid import (default 300W) |
 
 ### Grid power sensor sign convention
 
@@ -139,7 +142,9 @@ template:
 | `switch.rivian_charge_now` | Bypass solar logic — charge at 48A immediately |
 | `sensor.solar_charging_state` | idle / active / rampdown / charge_now |
 | `sensor.rivian_target_charge_amps` | Current target amperage |
-| `sensor.solar_export_power` | Calculated solar surplus (W) |
+| `sensor.solar_export_power` | Raw grid export power (W, positive = exporting) |
+| `sensor.powerwall_charging_power` | Power the Powerwall is currently absorbing (W) |
+| `sensor.solar_available_for_charging` | Net surplus available to the car: export + PW-charging − safety margin (W) |
 | `sensor.rivian_battery_level` | Car battery % (from Rivian API) |
 | `sensor.rivian_charger_state` | Rivian charger connection state |
 | `sensor.rivian_plugged_in` | True/False |
@@ -148,6 +153,7 @@ template:
 | `sensor.powerwall_state_of_charge` | Battery % (from your HA entity) |
 | `sensor.after_sunset_cutoff` | True when past sunset cutoff window |
 | `sensor.solar_charging_skip_reason` | Why charging is paused |
+| `sensor.rivian_charge_now_active` | True while Charge Now mode is active |
 
 ---
 
@@ -156,7 +162,9 @@ template:
 - Poll interval
 - EV charge target %
 - Powerwall start/stop thresholds
+- Powerwall power entity
 - Rivian session start limit
+- Safety margin (W)
 
 ---
 

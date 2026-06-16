@@ -19,8 +19,10 @@ from datetime import datetime, timedelta
 from enum import Enum
 from typing import Any
 
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import UnitOfPower
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.sun import get_astral_event_date
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
@@ -55,7 +57,7 @@ from .const import (
     SUNSET_CUTOFF_MINUTES,
     VOLTAGE,
 )
-from .rivian_client import RivianClient
+from .rivian_client import RivianAuthError, RivianClient
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -92,6 +94,7 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
         hass: HomeAssistant,
         rivian: RivianClient,
         config: dict[str, Any],
+        config_entry: ConfigEntry | None = None,
     ) -> None:
         self.rivian = rivian
         self.config = config
@@ -117,6 +120,7 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
             _LOGGER,
             name=DOMAIN,
             update_interval=timedelta(seconds=interval_seconds),
+            config_entry=config_entry,
         )
 
     # ------------------------------------------------------------------
@@ -213,6 +217,8 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
         vehicle_id = self.config[CONF_VEHICLE_ID]
         try:
             vstate = await self.rivian.get_vehicle_state(vehicle_id)
+        except RivianAuthError as err:
+            raise ConfigEntryAuthFailed(f"Rivian session expired: {err}") from err
         except Exception as err:  # noqa: BLE001
             raise UpdateFailed(f"Rivian API error: {err}") from err
 

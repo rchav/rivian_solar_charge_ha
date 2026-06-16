@@ -1,0 +1,1425 @@
+title: Home Systems
+kiosk_mode:
+  user_settings:
+    - users:
+        - Viewer
+      hide_sidebar: true
+      hide_menubutton: true
+      hide_settings: true
+      hide_notifications: true
+      hide_account: true
+      hide_search: true
+      hide_assistant: true
+      hide_overflow: true
+      block_overflow: true
+      hide_add_to_home_assistant: true
+      hide_dialog_header_settings: true
+      hide_dialog_header_overflow: true
+      hide_dialog_header_breadcrumb_navigation: true
+      hide_dialog_climate_actions: true
+      hide_dialog_light_actions: true
+      hide_dialog_media_actions: true
+      hide_dialog_timer_actions: true
+      hide_dialog_update_actions: true
+      hide_dialog_camera_actions: true
+views:
+  - title: Home
+    path: home
+    icon: mdi:home
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Climate
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: tile
+                entity: climate.thermostat
+                name: Thermostat
+                visibility:
+                  - condition: not
+                    conditions:
+                      - condition: user
+                        users:
+                          - 648bf1805d0d45c998b763690aa98813
+              - type: tile
+                entity: climate.thermostat
+                name: Thermostat
+                tap_action:
+                  action: none
+                hold_action:
+                  action: none
+                double_tap_action:
+                  action: none
+                icon_tap_action:
+                  action: none
+                visibility:
+                  - condition: user
+                    users:
+                      - 648bf1805d0d45c998b763690aa98813
+              - type: tile
+                entity: sensor.thermostat_humidity
+                name: Humidity
+      - type: grid
+        cards:
+          - type: heading
+            heading: Rivian
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+              - type: tile
+                entity: sensor.los_carlos_battery_state_of_charge
+                name: Battery
+              - type: tile
+                entity: sensor.los_carlos_estimated_vehicle_range
+                name: Range
+              - type: tile
+                entity: sensor.los_carlos_charging_time_remaining
+                name: Time to Full
+              - type: tile
+                entity: switch.rivian_solar_charging
+                name: Solar Charging
+                visibility:
+                  - condition: not
+                    conditions:
+                      - condition: user
+                        users:
+                          - 648bf1805d0d45c998b763690aa98813
+              - type: tile
+                entity: switch.rivian_solar_charging
+                name: Solar Charging
+                tap_action:
+                  action: none
+                hold_action:
+                  action: none
+                double_tap_action:
+                  action: none
+                icon_tap_action:
+                  action: none
+                visibility:
+                  - condition: user
+                    users:
+                      - 648bf1805d0d45c998b763690aa98813
+              - type: tile
+                entity: sensor.solar_charging_state
+                name: Charging State
+              - type: tile
+                entity: sensor.rivian_target_charge_amps
+                name: Target Amps
+      - type: grid
+        cards:
+          - type: heading
+            heading: Pool
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+              - type: tile
+                entity: switch.mar_de_chavez_pool
+                name: Pool
+                visibility:
+                  - condition: not
+                    conditions:
+                      - condition: user
+                        users:
+                          - 648bf1805d0d45c998b763690aa98813
+              - type: tile
+                entity: switch.mar_de_chavez_pool
+                name: Pool
+                tap_action:
+                  action: none
+                hold_action:
+                  action: none
+                double_tap_action:
+                  action: none
+                icon_tap_action:
+                  action: none
+                visibility:
+                  - condition: user
+                    users:
+                      - 648bf1805d0d45c998b763690aa98813
+              - type: tile
+                entity: water_heater.mar_de_chavez_pool
+                name: Heater
+                visibility:
+                  - condition: not
+                    conditions:
+                      - condition: user
+                        users:
+                          - 648bf1805d0d45c998b763690aa98813
+              - type: tile
+                entity: water_heater.mar_de_chavez_pool
+                name: Heater
+                tap_action:
+                  action: none
+                hold_action:
+                  action: none
+                double_tap_action:
+                  action: none
+                icon_tap_action:
+                  action: none
+                visibility:
+                  - condition: user
+                    users:
+                      - 648bf1805d0d45c998b763690aa98813
+              - type: tile
+                entity: sensor.mar_de_chavez_water_sensor
+                name: Water Temp
+      - type: grid
+        cards:
+          - type: heading
+            heading: Hot Water
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+              - type: tile
+                entity: sensor.harvest_tank_charge
+                name: Tank Charge
+              - type: tile
+                entity: sensor.harvest_mode
+                name: Mode
+              - type: tile
+                entity: sensor.harvest_heater_state
+                name: Heater State
+      - type: grid
+        cards:
+          - type: heading
+            heading: Energy
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+              - type: tile
+                entity: sensor.my_home_solar_power
+                name: Solar
+              - type: tile
+                entity: sensor.my_home_load_power
+                name: Home Load
+              - type: tile
+                entity: sensor.my_home_grid_power
+                name: Grid
+              - type: tile
+                entity: sensor.my_home_battery_power
+                name: Battery
+              - type: tile
+                entity: sensor.my_home_percentage_charged
+                name: Powerwall %
+              - type: tile
+                entity: sensor.my_home_grid_status
+                name: Grid Status
+          - type: history-graph
+            title: Power Flow
+            hours_to_show: 12
+            refresh_interval: 60
+            entities:
+              - entity: sensor.my_home_solar_power
+                name: Solar
+              - entity: sensor.my_home_load_power
+                name: Home Load
+              - entity: sensor.my_home_battery_power
+                name: Battery
+              - entity: sensor.my_home_grid_power
+                name: Grid
+      - type: grid
+        cards:
+          - type: heading
+            heading: Security
+          - type: logbook
+            title: Recent Activity
+            hours_to_show: 6
+            entities:
+              - binary_sensor.doorbell_doorbell
+              - binary_sensor.doorbell_person_detected
+              - binary_sensor.front_yard_person_detected
+              - binary_sensor.driveway_person_detected
+              - binary_sensor.driveway_vehicle_detected
+              - binary_sensor.back_yard_person_detected
+              - binary_sensor.garage_person_detected
+              - binary_sensor.garage_vehicle_detected
+    show_icon_and_title: true
+    dense_section_placement: true
+    cards: []
+  - title: Pool
+    path: pool
+    icon: mdi:pool
+    type: sections
+    max_columns: 4
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: At a Glance
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+              - type: tile
+                entity: switch.mar_de_chavez_pool
+                name: Pool
+                visibility:
+                  - condition: not
+                    conditions:
+                      - condition: user
+                        users:
+                          - 648bf1805d0d45c998b763690aa98813
+              - type: tile
+                entity: switch.mar_de_chavez_pool
+                name: Pool
+                tap_action:
+                  action: none
+                hold_action:
+                  action: none
+                double_tap_action:
+                  action: none
+                icon_tap_action:
+                  action: none
+                visibility:
+                  - condition: user
+                    users:
+                      - 648bf1805d0d45c998b763690aa98813
+              - type: tile
+                entity: water_heater.mar_de_chavez_pool
+                name: Heater
+                visibility:
+                  - condition: not
+                    conditions:
+                      - condition: user
+                        users:
+                          - 648bf1805d0d45c998b763690aa98813
+              - type: tile
+                entity: water_heater.mar_de_chavez_pool
+                name: Heater
+                tap_action:
+                  action: none
+                hold_action:
+                  action: none
+                double_tap_action:
+                  action: none
+                icon_tap_action:
+                  action: none
+                visibility:
+                  - condition: user
+                    users:
+                      - 648bf1805d0d45c998b763690aa98813
+              - type: tile
+                entity: sensor.mar_de_chavez_water_sensor
+                name: Water
+              - type: tile
+                entity: sensor.mar_de_chavez_air_sensor
+                name: Air
+              - type: tile
+                entity: sensor.mar_de_chavez_vsf_gpm
+                name: Flow
+              - type: tile
+                entity: sensor.mar_de_chavez_vsf_power
+                name: Watts
+              - type: tile
+                entity: sensor.mar_de_chavez_vsf_rpm
+                name: RPM
+              - type: tile
+                entity: sensor.mar_de_chavez_intellichlor_salt
+                name: Salt
+              - type: tile
+                entity: light.mar_de_chavez_pool_light
+                name: Light
+                visibility:
+                  - condition: not
+                    conditions:
+                      - condition: user
+                        users:
+                          - 648bf1805d0d45c998b763690aa98813
+              - type: tile
+                entity: light.mar_de_chavez_pool_light
+                name: Light
+                tap_action:
+                  action: none
+                hold_action:
+                  action: none
+                double_tap_action:
+                  action: none
+                icon_tap_action:
+                  action: none
+                visibility:
+                  - condition: user
+                    users:
+                      - 648bf1805d0d45c998b763690aa98813
+          - type: heading
+            heading: Main Controls
+          - type: entities
+            title: Controls
+            show_header_toggle: false
+            visibility:
+              - condition: not
+                conditions:
+                  - condition: user
+                    users:
+                      - 648bf1805d0d45c998b763690aa98813
+            entities:
+              - entity: switch.mar_de_chavez_pool
+                name: Pool Circuit
+              - entity: water_heater.mar_de_chavez_pool
+                name: Heater
+              - entity: climate.mar_de_chavez_pool
+                name: Climate Mode
+              - entity: light.mar_de_chavez_pool_light
+                name: Pool Light
+              - entity: switch.mar_de_chavez_vacation_mode
+                name: Vacation Mode
+          - type: entities
+            title: Controls
+            show_header_toggle: false
+            visibility:
+              - condition: user
+                users:
+                  - 648bf1805d0d45c998b763690aa98813
+            entities:
+              - type: simple-entity
+                entity: switch.mar_de_chavez_pool
+                name: Pool Circuit
+              - type: simple-entity
+                entity: water_heater.mar_de_chavez_pool
+                name: Heater
+              - type: simple-entity
+                entity: climate.mar_de_chavez_pool
+                name: Climate Mode
+              - type: simple-entity
+                entity: light.mar_de_chavez_pool_light
+                name: Pool Light
+              - type: simple-entity
+                entity: switch.mar_de_chavez_vacation_mode
+                name: Vacation Mode
+          - type: heading
+            heading: Salt / Chlorine
+          - type: entities
+            title: IntelliChlor
+            visibility:
+              - condition: not
+                conditions:
+                  - condition: user
+                    users:
+                      - 648bf1805d0d45c998b763690aa98813
+            entities:
+              - entity: sensor.mar_de_chavez_intellichlor_salt
+                name: Salt Level
+              - entity: number.mar_de_chavez_intellichlor_output_pool
+                name: Output %
+              - entity: switch.mar_de_chavez_intellichlor_superchlorinate
+                name: Superchlorinate
+          - type: entities
+            title: IntelliChlor
+            visibility:
+              - condition: user
+                users:
+                  - 648bf1805d0d45c998b763690aa98813
+            entities:
+              - entity: sensor.mar_de_chavez_intellichlor_salt
+                name: Salt Level
+              - type: simple-entity
+                entity: number.mar_de_chavez_intellichlor_output_pool
+                name: Output %
+              - type: simple-entity
+                entity: switch.mar_de_chavez_intellichlor_superchlorinate
+                name: Superchlorinate
+      - type: grid
+        cards:
+          - type: heading
+            heading: Heating
+          - type: entities
+            title: Heater Status
+            visibility:
+              - condition: not
+                conditions:
+                  - condition: user
+                    users:
+                      - 648bf1805d0d45c998b763690aa98813
+            entities:
+              - entity: binary_sensor.mar_de_chavez_ultratemp
+                name: UltraTemp
+              - entity: number.mar_de_chavez_pool_max_temperature
+                name: Max Temp
+              - entity: sensor.mar_de_chavez_water_sensor
+                name: Water Temp
+              - entity: sensor.mar_de_chavez_air_sensor
+                name: Air Temp
+          - type: entities
+            title: Heater Status
+            visibility:
+              - condition: user
+                users:
+                  - 648bf1805d0d45c998b763690aa98813
+            entities:
+              - entity: binary_sensor.mar_de_chavez_ultratemp
+                name: UltraTemp
+              - type: simple-entity
+                entity: number.mar_de_chavez_pool_max_temperature
+                name: Max Temp
+              - entity: sensor.mar_de_chavez_water_sensor
+                name: Water Temp
+              - entity: sensor.mar_de_chavez_air_sensor
+                name: Air Temp
+          - type: history-graph
+            title: Temperature History
+            hours_to_show: 48
+            refresh_interval: 60
+            entities:
+              - entity: sensor.mar_de_chavez_water_sensor
+                name: Water
+              - entity: sensor.mar_de_chavez_air_sensor
+                name: Air
+      - type: grid
+        cards:
+          - type: heading
+            heading: Pump
+          - type: entities
+            title: Pump Controls
+            visibility:
+              - condition: not
+                conditions:
+                  - condition: user
+                    users:
+                      - 648bf1805d0d45c998b763690aa98813
+            entities:
+              - entity: binary_sensor.mar_de_chavez_vsf
+                name: Pump Status
+              - entity: sensor.mar_de_chavez_vsf_gpm
+                name: Flow
+              - entity: sensor.mar_de_chavez_vsf_rpm
+                name: RPM
+              - entity: sensor.mar_de_chavez_vsf_power
+                name: Watts
+              - entity: select.mar_de_chavez_vsf_mode_pool
+                name: Pool Mode
+              - entity: number.mar_de_chavez_vsf_speed_pool
+                name: Pool Speed
+              - entity: select.mar_de_chavez_vsf_mode_super_skim
+                name: Super Skim Mode
+              - entity: number.mar_de_chavez_vsf_speed_super_skim
+                name: Super Skim Speed
+          - type: entities
+            title: Pump Controls
+            visibility:
+              - condition: user
+                users:
+                  - 648bf1805d0d45c998b763690aa98813
+            entities:
+              - entity: binary_sensor.mar_de_chavez_vsf
+                name: Pump Status
+              - entity: sensor.mar_de_chavez_vsf_gpm
+                name: Flow
+              - entity: sensor.mar_de_chavez_vsf_rpm
+                name: RPM
+              - entity: sensor.mar_de_chavez_vsf_power
+                name: Watts
+              - type: simple-entity
+                entity: select.mar_de_chavez_vsf_mode_pool
+                name: Pool Mode
+              - type: simple-entity
+                entity: number.mar_de_chavez_vsf_speed_pool
+                name: Pool Speed
+              - type: simple-entity
+                entity: select.mar_de_chavez_vsf_mode_super_skim
+                name: Super Skim Mode
+              - type: simple-entity
+                entity: number.mar_de_chavez_vsf_speed_super_skim
+                name: Super Skim Speed
+          - type: history-graph
+            title: Pump History
+            hours_to_show: 24
+            refresh_interval: 60
+            entities:
+              - entity: sensor.mar_de_chavez_vsf_gpm
+                name: GPM
+              - entity: sensor.mar_de_chavez_vsf_rpm
+                name: RPM
+              - entity: sensor.mar_de_chavez_vsf_power
+                name: Watts
+          - type: history-graph
+            title: Salt / Output History
+            hours_to_show: 168
+            refresh_interval: 300
+            entities:
+              - entity: sensor.mar_de_chavez_intellichlor_salt
+                name: Salt
+              - entity: number.mar_de_chavez_intellichlor_output_pool
+                name: Output %
+    show_icon_and_title: true
+    dense_section_placement: true
+    cards: []
+  - title: Harvest
+    path: harvest
+    icon: mdi:water-boiler
+    type: sections
+    max_columns: 4
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: At a Glance
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+              - type: tile
+                entity: sensor.harvest_tank_charge
+                name: Tank Charge
+              - type: tile
+                entity: sensor.harvest_mid_tank_temp
+                name: Mid Tank
+              - type: tile
+                entity: sensor.harvest_tank_temp_estimated
+                name: Tank Est.
+              - type: tile
+                entity: sensor.harvest_outdoor_temp
+                name: Outdoor
+              - type: tile
+                entity: sensor.harvest_sanco2_heat_pump_power
+                name: SANCO2 Watts
+              - type: tile
+                entity: sensor.harvest_carrier_heat_pump_power
+                name: Carrier VA
+          - type: entities
+            title: Harvest Status
+            entities:
+              - entity: sensor.harvest_mode
+                name: Mode
+              - entity: sensor.harvest_heater_call
+                name: Heater Call
+              - entity: sensor.harvest_heater_state
+                name: Heater State
+              - entity: sensor.harvest_net_flow
+                name: Net Flow
+              - entity: sensor.harvest_hot_water_to_heating_and_pre_mix_dhw
+                name: Hot Water Supply
+      - type: grid
+        cards:
+          - type: heading
+            heading: Tank Charge History
+          - type: history-graph
+            title: Tank Charge
+            hours_to_show: 48
+            refresh_interval: 60
+            entities:
+              - entity: sensor.harvest_tank_charge
+                name: Tank Charge
+          - type: heading
+            heading: Temperature History
+          - type: history-graph
+            title: Tank Temp
+            hours_to_show: 48
+            refresh_interval: 60
+            entities:
+              - entity: sensor.harvest_mid_tank_temp
+                name: Mid Tank
+              - entity: sensor.harvest_outdoor_temp
+                name: Outdoor
+      - type: grid
+        cards:
+          - type: heading
+            heading: Power History
+          - type: history-graph
+            title: Heat Pump Power
+            hours_to_show: 24
+            refresh_interval: 60
+            entities:
+              - entity: sensor.harvest_sanco2_heat_pump_power
+                name: SANCO2
+              - entity: sensor.harvest_carrier_heat_pump_power
+                name: Carrier
+    show_icon_and_title: true
+    dense_section_placement: true
+    cards: []
+  - title: Energy
+    path: energy
+    icon: mdi:solar-power
+    type: sections
+    max_columns: 4
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: At a Glance
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+              - type: tile
+                entity: sensor.my_home_solar_power
+                name: Solar
+              - type: tile
+                entity: sensor.my_home_load_power
+                name: Home Load
+              - type: tile
+                entity: sensor.my_home_battery_power
+                name: Battery
+              - type: tile
+                entity: sensor.my_home_grid_power
+                name: Grid
+              - type: tile
+                entity: sensor.my_home_percentage_charged
+                name: Powerwall %
+              - type: tile
+                entity: sensor.my_home_grid_status
+                name: Grid Status
+          - type: heading
+            heading: Power Flow
+          - type: history-graph
+            title: Live Power - Last 24 Hours
+            hours_to_show: 24
+            refresh_interval: 60
+            entities:
+              - entity: sensor.my_home_solar_power
+                name: Solar
+              - entity: sensor.my_home_load_power
+                name: Home Load
+              - entity: sensor.my_home_battery_power
+                name: Battery
+              - entity: sensor.my_home_grid_power
+                name: Grid
+      - type: grid
+        cards:
+          - type: heading
+            heading: Battery
+          - type: entities
+            title: Powerwall
+            visibility:
+              - condition: not
+                conditions:
+                  - condition: user
+                    users:
+                      - 648bf1805d0d45c998b763690aa98813
+            entities:
+              - entity: sensor.my_home_percentage_charged
+                name: Charge %
+              - entity: sensor.my_home_battery_power
+                name: Battery Power
+              - entity: sensor.my_home_battery_charged
+                name: Battery Charged
+              - entity: sensor.my_home_battery_discharged
+                name: Battery Discharged
+              - entity: number.my_home_backup_reserve
+                name: Backup Reserve
+              - entity: sensor.my_home_vpp_backup_reserve
+                name: VPP Backup Reserve
+              - entity: binary_sensor.my_home_backup_capable
+                name: Backup Capable
+          - type: entities
+            title: Powerwall
+            visibility:
+              - condition: user
+                users:
+                  - 648bf1805d0d45c998b763690aa98813
+            entities:
+              - entity: sensor.my_home_percentage_charged
+                name: Charge %
+              - entity: sensor.my_home_battery_power
+                name: Battery Power
+              - entity: sensor.my_home_battery_charged
+                name: Battery Charged
+              - entity: sensor.my_home_battery_discharged
+                name: Battery Discharged
+              - type: simple-entity
+                entity: number.my_home_backup_reserve
+                name: Backup Reserve
+              - entity: sensor.my_home_vpp_backup_reserve
+                name: VPP Backup Reserve
+              - entity: binary_sensor.my_home_backup_capable
+                name: Backup Capable
+          - type: heading
+            heading: Controls
+          - type: entities
+            title: Tesla Settings
+            show_header_toggle: false
+            visibility:
+              - condition: not
+                conditions:
+                  - condition: user
+                    users:
+                      - 648bf1805d0d45c998b763690aa98813
+            entities:
+              - entity: select.my_home_operation_mode
+                name: Operation Mode
+              - entity: number.my_home_backup_reserve
+                name: Backup Reserve
+              - entity: switch.my_home_allow_charging_from_grid
+                name: Allow Charging From Grid
+              - entity: select.my_home_allow_export
+                name: Allow Export
+              - entity: switch.my_home_storm_watch
+                name: Storm Watch
+          - type: entities
+            title: Tesla Settings
+            show_header_toggle: false
+            visibility:
+              - condition: user
+                users:
+                  - 648bf1805d0d45c998b763690aa98813
+            entities:
+              - type: simple-entity
+                entity: select.my_home_operation_mode
+                name: Operation Mode
+              - type: simple-entity
+                entity: number.my_home_backup_reserve
+                name: Backup Reserve
+              - type: simple-entity
+                entity: switch.my_home_allow_charging_from_grid
+                name: Allow Charging From Grid
+              - type: simple-entity
+                entity: select.my_home_allow_export
+                name: Allow Export
+              - type: simple-entity
+                entity: switch.my_home_storm_watch
+                name: Storm Watch
+      - type: grid
+        cards:
+          - type: heading
+            heading: Solar / Grid
+          - type: entities
+            title: Solar & Grid
+            entities:
+              - entity: sensor.my_home_solar_power
+                name: Solar Power
+              - entity: sensor.my_home_solar_generated
+                name: Solar Generated
+              - entity: sensor.my_home_grid_power
+                name: Grid Power
+              - entity: sensor.my_home_grid_imported
+                name: Grid Imported
+              - entity: sensor.my_home_grid_exported
+                name: Grid Exported
+              - entity: sensor.my_home_home_usage
+                name: Home Usage
+              - entity: sensor.my_home_load_power
+                name: Load Power
+          - type: heading
+            heading: Grid Services / System
+          - type: entities
+            title: Status
+            entities:
+              - entity: binary_sensor.my_home_storm_watch_active
+                name: Storm Watch Active
+              - entity: binary_sensor.my_home_grid_services_active
+                name: Grid Services Active
+              - entity: binary_sensor.my_home_grid_services_enabled
+                name: Grid Services Enabled
+              - entity: sensor.my_home_grid_status
+                name: Grid Status
+              - entity: sensor.my_home_version
+                name: Version
+    show_icon_and_title: true
+    dense_section_placement: true
+    cards: []
+  - title: Rivian
+    path: rivian
+    icon: mdi:car-electric
+    type: sections
+    max_columns: 3
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Los Carlos
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: image.los_carlos_three_quarter_light
+                state_not: unavailable
+            card:
+              type: picture-entity
+              entity: image.los_carlos_three_quarter_light
+              show_name: false
+              show_state: false
+          - type: entities
+            title: Solar Charging
+            visibility:
+              - condition: not
+                conditions:
+                  - condition: user
+                    users:
+                      - 648bf1805d0d45c998b763690aa98813
+            entities:
+              - entity: sensor.solar_charging_skip_reason
+                name: Skip Reason
+              - entity: sensor.rivian_battery_level
+                name: Rivian Battery
+              - entity: sensor.rivian_charger_state
+                name: Charger State
+              - entity: sensor.rivian_plugged_in
+                name: Plugged In
+              - entity: sensor.rivian_at_home
+                name: At Home
+              - entity: sensor.rivian_distance_from_home
+                name: Distance From Home
+              - entity: update.rivian_solar_charging_update
+                name: Integration Update
+          - type: heading
+            heading: Tires
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: tile
+                entity: sensor.los_carlos_tire_pressure_front_left
+                name: Front Left
+              - type: tile
+                entity: sensor.los_carlos_tire_pressure_front_right
+                name: Front Right
+              - type: tile
+                entity: sensor.los_carlos_tire_pressure_rear_left
+                name: Rear Left
+              - type: tile
+                entity: sensor.los_carlos_tire_pressure_rear_right
+                name: Rear Right
+          - type: heading
+            heading: Status
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+              - type: tile
+                entity: sensor.los_carlos_battery_state_of_charge
+                name: Battery
+              - type: tile
+                entity: sensor.los_carlos_estimated_vehicle_range
+                name: Range
+              - type: tile
+                entity: sensor.los_carlos_power_state
+                name: Power
+              - type: tile
+                entity: sensor.los_carlos_gear_selector
+                name: Gear
+              - type: tile
+                entity: sensor.los_carlos_drive_mode
+                name: Drive Mode
+              - type: tile
+                entity: sensor.los_carlos_charging_time_remaining
+                name: Time to Full
+          - type: entities
+            title: Vehicle Info
+            entities:
+              - entity: sensor.los_carlos_active_driver
+                name: Driver
+              - entity: sensor.los_carlos_speed
+                name: Speed
+              - entity: sensor.los_carlos_odometer
+                name: Odometer
+              - entity: sensor.los_carlos_service_mode
+                name: Service Mode
+              - entity: sensor.los_carlos_trailer_status
+                name: Trailer
+              - entity: binary_sensor.los_carlos_wiper_fluid_level
+                name: Wiper Fluid
+      - type: grid
+        cards:
+          - type: heading
+            heading: Solar Charging
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+              - type: tile
+                entity: switch.rivian_solar_charging
+                name: Enabled
+                visibility:
+                  - condition: not
+                    conditions:
+                      - condition: user
+                        users:
+                          - 648bf1805d0d45c998b763690aa98813
+              - type: tile
+                entity: switch.rivian_solar_charging
+                name: Enabled
+                tap_action:
+                  action: none
+                hold_action:
+                  action: none
+                double_tap_action:
+                  action: none
+                icon_tap_action:
+                  action: none
+                visibility:
+                  - condition: user
+                    users:
+                      - 648bf1805d0d45c998b763690aa98813
+              - type: tile
+                entity: sensor.solar_charging_state
+                name: State
+              - type: tile
+                entity: sensor.rivian_target_charge_amps
+                name: Target Amps
+              - type: tile
+                entity: sensor.solar_export_power
+                name: Solar Export
+              - type: tile
+                entity: sensor.rivian_solar_charging_powerwall_charging_power
+                name: PW Charging
+              - type: tile
+                entity: sensor.rivian_solar_charging_solar_available_for_charging
+                name: Available
+              - type: tile
+                entity: sensor.powerwall_state_of_charge
+                name: Powerwall
+              - type: tile
+                entity: sensor.after_sunset_cutoff
+                name: Past Sunset
+              - type: tile
+                entity: switch.rivian_charge_now
+                name: Charge Now
+                visibility:
+                  - condition: not
+                    conditions:
+                      - condition: user
+                        users:
+                          - 648bf1805d0d45c998b763690aa98813
+              - type: tile
+                entity: switch.rivian_charge_now
+                name: Charge Now
+                tap_action:
+                  action: none
+                hold_action:
+                  action: none
+                double_tap_action:
+                  action: none
+                icon_tap_action:
+                  action: none
+                visibility:
+                  - condition: user
+                    users:
+                      - 648bf1805d0d45c998b763690aa98813
+          - type: entities
+            title: Detail
+            visibility:
+              - condition: user
+                users:
+                  - 648bf1805d0d45c998b763690aa98813
+            entities:
+              - entity: sensor.solar_charging_skip_reason
+                name: Skip Reason
+              - entity: sensor.rivian_battery_level
+                name: Rivian Battery
+              - entity: sensor.rivian_charger_state
+                name: Charger State
+              - entity: sensor.rivian_plugged_in
+                name: Plugged In
+              - entity: sensor.rivian_at_home
+                name: At Home
+              - entity: sensor.rivian_distance_from_home
+                name: Distance From Home
+              - type: simple-entity
+                entity: update.rivian_solar_charging_update
+                name: Integration Update
+          - type: history-graph
+            title: Charging History
+            hours_to_show: 24
+            refresh_interval: 60
+            entities:
+              - entity: sensor.rivian_target_charge_amps
+                name: Target Amps
+              - entity: sensor.solar_export_power
+                name: Solar Export
+              - entity: sensor.rivian_solar_charging_solar_available_for_charging
+                name: Available
+              - entity: sensor.powerwall_state_of_charge
+                name: Powerwall %
+      - type: grid
+        cards:
+          - type: heading
+            heading: Charge Session
+          - type: entities
+            title: Live Session
+            entities:
+              - entity: sensor.los_carlos_battery_state_of_charge
+                name: Battery Level
+              - entity: sensor.los_carlos_battery_state_of_charge_limit
+                name: Charge Limit
+              - entity: sensor.los_carlos_charging_time_remaining
+                name: Time Remaining
+              - entity: sensor.wall_charger_charging_status
+                name: Wall Charger
+          - type: markdown
+            content: >
+              {%- macro row(entity, fallback) -%}
+                {%- set s = states(entity) -%}
+                {%- if s in ['unknown', 'unavailable', 'none', ''] -%}
+                  {{ fallback }}
+                {%- else -%}
+                  {%- set unit = state_attr(entity, 'unit_of_measurement') -%}
+                  {{ s }}{% if unit %} {{ unit }}{% endif %}
+                {%- endif -%}
+              {%- endmacro -%}
+
+
+              ### Session Activity
+
+
+              | | |
+
+              |:--|--:|
+
+              | <ha-icon icon="mdi:speedometer"></ha-icon> Charge Rate | {{
+              row('sensor.los_carlos_charging_rate', 'Not charging') }} |
+
+              | <ha-icon icon="mdi:flash"></ha-icon> Charge Speed | {{
+              row('sensor.los_carlos_charging_speed', 'Not charging') }} |
+
+              | <ha-icon icon="mdi:flash"></ha-icon> Energy Delivered | {{
+              row('sensor.los_carlos_charging_energy_delivered', '0 kWh') }} |
+
+              | <ha-icon icon="mdi:arrow-left-right"></ha-icon> Range Added | {{
+              row('sensor.los_carlos_charging_range_added', '0 mi') }} |
+
+              | <ha-icon icon="mdi:sine-wave"></ha-icon> Wall Charger Amps | {{
+              row('sensor.wall_charger_amperage', '0 A') }} |
+
+              | <ha-icon icon="mdi:flash"></ha-icon> Wall Charger Power | {{
+              row('sensor.wall_charger_power', '0 W') }} |
+          - type: heading
+            heading: Software
+          - type: entities
+            title: OTA
+            visibility:
+              - condition: not
+                conditions:
+                  - condition: user
+                    users:
+                      - 648bf1805d0d45c998b763690aa98813
+            entities:
+              - entity: update.los_carlos_software
+                name: Software
+              - entity: sensor.los_carlos_software_ota_status
+                name: Status
+              - entity: sensor.los_carlos_software_ota_status_current
+                name: Current Status
+              - entity: sensor.los_carlos_software_ota_install_ready
+                name: Install Ready
+              - entity: sensor.los_carlos_software_ota_download_progress
+                name: Download Progress
+              - entity: sensor.los_carlos_software_ota_install_time
+                name: Install Time
+              - entity: sensor.los_carlos_software_ota_install_duration
+                name: Install Duration
+              - entity: sensor.los_carlos_software_ota_install_type
+                name: Install Type
+          - type: entities
+            title: OTA
+            visibility:
+              - condition: user
+                users:
+                  - 648bf1805d0d45c998b763690aa98813
+            entities:
+              - type: simple-entity
+                entity: update.los_carlos_software
+                name: Software
+              - entity: sensor.los_carlos_software_ota_status
+                name: Status
+              - entity: sensor.los_carlos_software_ota_status_current
+                name: Current Status
+              - entity: sensor.los_carlos_software_ota_install_ready
+                name: Install Ready
+              - entity: sensor.los_carlos_software_ota_download_progress
+                name: Download Progress
+              - entity: sensor.los_carlos_software_ota_install_time
+                name: Install Time
+              - entity: sensor.los_carlos_software_ota_install_duration
+                name: Install Duration
+              - entity: sensor.los_carlos_software_ota_install_type
+                name: Install Type
+    show_icon_and_title: true
+    dense_section_placement: true
+    cards: []
+  - title: Cameras
+    path: cameras
+    icon: mdi:cctv
+    panel: true
+    visible:
+      - user: 50fa87ec134244f2ab905a0fbf0826c6
+      - user: 2cc1323381fd41879fd7ef4c0e2593d8
+    cards:
+      - type: horizontal-stack
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: logbook
+                title: Detection Timeline
+                hours_to_show: 12
+                entities:
+                  - binary_sensor.doorbell_doorbell
+                  - binary_sensor.doorbell_person_detected
+                  - binary_sensor.doorbell_motion
+                  - binary_sensor.front_yard_person_detected
+                  - binary_sensor.front_yard_vehicle_detected
+                  - binary_sensor.driveway_person_detected
+                  - binary_sensor.driveway_vehicle_detected
+                  - binary_sensor.back_yard_person_detected
+                  - binary_sensor.back_yard_animal_detected
+                  - binary_sensor.garage_person_detected
+                  - binary_sensor.garage_vehicle_detected
+              - type: entities
+                title: Live Detection State
+                show_header_toggle: false
+                entities:
+                  - type: section
+                    label: Doorbell
+                  - entity: binary_sensor.doorbell_doorbell
+                    name: Press
+                  - entity: binary_sensor.doorbell_person_detected
+                    name: Person
+                  - entity: binary_sensor.doorbell_motion
+                    name: Motion
+                  - type: section
+                    label: Front / Driveway
+                  - entity: binary_sensor.front_yard_person_detected
+                    name: Front Person
+                  - entity: binary_sensor.front_yard_vehicle_detected
+                    name: Front Vehicle
+                  - entity: binary_sensor.driveway_person_detected
+                    name: Driveway Person
+                  - entity: binary_sensor.driveway_vehicle_detected
+                    name: Driveway Vehicle
+                  - type: section
+                    label: Back / Garage
+                  - entity: binary_sensor.back_yard_person_detected
+                    name: Back Person
+                  - entity: binary_sensor.back_yard_animal_detected
+                    name: Back Animal
+                  - entity: binary_sensor.garage_person_detected
+                    name: Garage Person
+                  - entity: binary_sensor.garage_vehicle_detected
+                    name: Garage Vehicle
+              - type: entities
+                title: Recorder Health
+                entities:
+                  - entity: sensor.udmpro_storage_utilization
+                    name: Storage
+                  - entity: sensor.udmpro_cpu_utilization
+                    name: CPU
+                  - entity: sensor.udmpro_memory_utilization
+                    name: Memory
+                  - entity: binary_sensor.udmpro_ssd_1
+                    name: SSD
+          - type: vertical-stack
+            cards:
+              - type: custom:advanced-camera-card
+                cameras:
+                  - camera_entity: camera.front_yard_high_resolution_channel
+                    title: Front Yard
+                live:
+                  lazy_unload:
+                    - unselected
+                    - hidden
+              - type: custom:advanced-camera-card
+                cameras:
+                  - camera_entity: camera.driveway_high_resolution_channel
+                    title: Driveway
+                live:
+                  lazy_unload:
+                    - unselected
+                    - hidden
+              - type: custom:advanced-camera-card
+                cameras:
+                  - camera_entity: camera.doorbell_high_resolution_channel
+                    title: Doorbell
+                live:
+                  lazy_unload:
+                    - unselected
+                    - hidden
+          - type: vertical-stack
+            cards:
+              - type: custom:advanced-camera-card
+                cameras:
+                  - camera_entity: camera.back_yard_high_resolution_channel
+                    title: Back Yard
+                live:
+                  lazy_unload:
+                    - unselected
+                    - hidden
+              - type: custom:advanced-camera-card
+                cameras:
+                  - camera_entity: camera.garage_high_resolution_channel
+                    title: Garage
+                live:
+                  lazy_unload:
+                    - unselected
+                    - hidden
+              - type: entities
+                title: Camera Conditions
+                entities:
+                  - entity: binary_sensor.doorbell_is_dark
+                    name: Doorbell Dark
+                  - entity: binary_sensor.front_yard_is_dark
+                    name: Front Yard Dark
+                  - entity: binary_sensor.driveway_is_dark
+                    name: Driveway Dark
+                  - entity: binary_sensor.back_yard_is_dark
+                    name: Back Yard Dark
+                  - entity: binary_sensor.garage_is_dark
+                    name: Garage Dark
+    type: panel
+    show_icon_and_title: true
+  - title: Climate
+    path: climate
+    icon: mdi:thermostat
+    type: sections
+    max_columns: 3
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Thermostat
+          - type: thermostat
+            entity: climate.thermostat
+            visibility:
+              - condition: not
+                conditions:
+                  - condition: user
+                    users:
+                      - 648bf1805d0d45c998b763690aa98813
+          - type: tile
+            entity: climate.thermostat
+            name: Thermostat
+            tap_action:
+              action: none
+            hold_action:
+              action: none
+            double_tap_action:
+              action: none
+            icon_tap_action:
+              action: none
+            visibility:
+              - condition: user
+                users:
+                  - 648bf1805d0d45c998b763690aa98813
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: tile
+                entity: sensor.thermostat_temperature
+                name: Temperature
+              - type: tile
+                entity: sensor.thermostat_humidity
+                name: Humidity
+              - type: tile
+                entity: binary_sensor.thermostat_occupancy
+                name: Occupancy
+              - type: tile
+                entity: weather.thermostat
+                name: Weather
+          - type: history-graph
+            title: Temperature & Humidity History
+            hours_to_show: 24
+            refresh_interval: 60
+            entities:
+              - entity: sensor.thermostat_temperature
+                name: Thermostat Temp
+              - entity: sensor.thermostat_humidity
+                name: Humidity
+      - type: grid
+        cards:
+          - type: heading
+            heading: Air Quality
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+              - type: tile
+                entity: sensor.thermostat_air_quality_index
+                name: AQI
+              - type: tile
+                entity: sensor.thermostat_carbon_dioxide
+                name: CO2
+              - type: tile
+                entity: sensor.thermostat_volatile_organic_compounds
+                name: VOC
+          - type: history-graph
+            title: Air Quality History
+            hours_to_show: 24
+            refresh_interval: 60
+            entities:
+              - entity: sensor.thermostat_air_quality_index
+                name: AQI
+              - entity: sensor.thermostat_carbon_dioxide
+                name: CO2
+              - entity: sensor.thermostat_volatile_organic_compounds
+                name: VOC
+          - type: heading
+            heading: Settings
+          - type: entities
+            title: Thermostat Settings
+            visibility:
+              - condition: not
+                conditions:
+                  - condition: user
+                    users:
+                      - 648bf1805d0d45c998b763690aa98813
+            entities:
+              - entity: switch.thermostat_auxiliary_heat_only
+                name: Auxiliary Heat Only
+              - entity: number.thermostat_compressor_minimum_temperature
+                name: Compressor Min Temp
+              - entity: number.thermostat_fan_minimum_on_time
+                name: Fan Min On Time
+          - type: entities
+            title: Thermostat Settings
+            visibility:
+              - condition: user
+                users:
+                  - 648bf1805d0d45c998b763690aa98813
+            entities:
+              - type: simple-entity
+                entity: switch.thermostat_auxiliary_heat_only
+                name: Auxiliary Heat Only
+              - type: simple-entity
+                entity: number.thermostat_compressor_minimum_temperature
+                name: Compressor Min Temp
+              - type: simple-entity
+                entity: number.thermostat_fan_minimum_on_time
+                name: Fan Min On Time
+      - type: grid
+        cards:
+          - type: heading
+            heading: Bedrooms
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: tile
+                entity: sensor.guest_room_temperature
+                name: Guest Room Temp
+              - type: tile
+                entity: binary_sensor.guest_room_occupancy
+                name: Guest Room Occupancy
+              - type: tile
+                entity: sensor.henrys_room_temperature
+                name: Henry's Room Temp
+              - type: tile
+                entity: binary_sensor.henrys_room_occupancy
+                name: Henry's Room Occupancy
+              - type: tile
+                entity: sensor.mom_and_dads_room_temperature
+                name: Mom & Dad's Room Temp
+              - type: tile
+                entity: binary_sensor.mom_and_dads_room_occupancy
+                name: Mom & Dad's Room Occupancy
+          - type: history-graph
+            title: Bedroom Temperatures
+            hours_to_show: 24
+            refresh_interval: 60
+            entities:
+              - entity: sensor.guest_room_temperature
+                name: Guest Room
+              - entity: sensor.henrys_room_temperature
+                name: Henry's Room
+              - entity: sensor.mom_and_dads_room_temperature
+                name: Mom & Dad's Room
+              - entity: sensor.thermostat_temperature
+                name: Living Room (Thermostat)
+    show_icon_and_title: true
+    dense_section_placement: true
+    cards: []
+

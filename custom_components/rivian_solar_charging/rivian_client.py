@@ -9,6 +9,7 @@ Inspired by: https://github.com/ostap-korkuna/rivian-charging-automation
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 from datetime import datetime
 from typing import Any
 
@@ -42,6 +43,11 @@ class RivianClient:
         self._app_session: str | None = None
         self._user_session: str | None = None
         self._refresh_token: str | None = None
+        self._on_tokens_refreshed: Callable[[], None] | None = None
+
+    def set_tokens_refreshed_callback(self, cb: Callable[[], None]) -> None:
+        """Register a callback invoked whenever silent token refresh succeeds."""
+        self._on_tokens_refreshed = cb
 
     # ------------------------------------------------------------------
     # Authentication
@@ -145,6 +151,8 @@ class RivianClient:
                 self._user_session = result["userSessionToken"]
                 self._refresh_token = result.get("refreshToken", self._refresh_token)
                 _LOGGER.info("Rivian tokens refreshed silently")
+                if self._on_tokens_refreshed:
+                    self._on_tokens_refreshed()
                 return True
         except Exception as err:  # noqa: BLE001
             _LOGGER.warning("Silent token refresh failed: %s", err)

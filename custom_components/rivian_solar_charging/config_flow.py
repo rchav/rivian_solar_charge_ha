@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Mapping
 from typing import Any
 
 import aiohttp
@@ -56,6 +57,8 @@ class RivianSolarChargingConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._csrf_token: str = ""
         self._app_session: str = ""
         self._user_session: str = ""
+        self._refresh_token: str = ""
+        self._reauth_entry: config_entries.ConfigEntry | None = None
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -73,6 +76,7 @@ class RivianSolarChargingConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     self._csrf_token = tokens["csrf_token"]
                     self._app_session = tokens["app_session"]
                     self._user_session = tokens["user_session"]
+                    self._refresh_token = tokens["refresh_token"]
                 return await self.async_step_vehicle()
             except RivianMFARequired as exc:
                 self._otp_token = exc.otp_token
@@ -114,6 +118,7 @@ class RivianSolarChargingConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     self._csrf_token = tokens["csrf_token"]
                     self._app_session = tokens["app_session"]
                     self._user_session = tokens["user_session"]
+                    self._refresh_token = tokens["refresh_token"]
                 return await self.async_step_vehicle()
             except RivianAuthError:
                 errors["base"] = "invalid_otp"
@@ -145,7 +150,7 @@ class RivianSolarChargingConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         CONF_CSRF_TOKEN: self._csrf_token,
                         CONF_APP_SESSION: self._app_session,
                         CONF_USER_SESSION: self._user_session,
-                        CONF_REFRESH_TOKEN: tokens.get("refresh_token", ""),
+                        CONF_REFRESH_TOKEN: self._refresh_token,
                         **user_input,
                     },
                 )
@@ -194,6 +199,111 @@ class RivianSolarChargingConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Coerce(int), vol.Range(min=0, max=2000)
                 ),
             }),
+            errors=errors,
+        )
+
+    async def async_step_reauth(
+        self, entry_data: Mapping[str, Any]
+    ) -> FlowResult:
+        self._reauth_entry = self.hass.config_entries.async_get_entry(
+            self.context["entry_id"]
+        )
+        return await self.async_step_reauth_confirm()
+
+    async def async_step_reauth_confirm(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        errors: dict[str, str] = {}
+
+        if user_input is not None:
+            self._email = user_input[CONF_EMAIL]
+            self._password = user_input[CONF_PASSWORD]
+            try:
+                async with aiohttp.ClientSession() as http:
+                    client = RivianClient(http)
+                    await client.login(self._email, self._password)
+                    tokens = client.get_session_tokens()
+                    self._csrf_token = tokens["csrf_token"]
+                    self._app_session = tokens["app_session"]
+                    self._user_session = tokens["user_session"]
+                    self._refresh_token = tokens["refresh_token"]
+                return self.async_update_reload_and_abort(
+                    self._reauth_entry,
+                    data={
+                        **self._reauth_entry.data,
+                        CONF_EMAIL: self._email,
+                        CONF_PASSWORD: self._password,
+                        CONF_CSRF_TOKEN: self._csrf_token,
+                        CONF_APP_SESSION: self._app_session,
+                        CONF_USER_SESSION: self._user_session,
+                        CONF_REFRESH_TOKEN: self._refresh_token,
+                    },
+                )
+            except RivianMFARequired as exc:
+                self._otp_token = exc.otp_token
+                async with aiohttp.ClientSession() as http:
+                    client = RivianClient(http)
+                    await client.create_csrf_token()
+                    tokens = client.get_session_tokens()
+                    self._csrf_token = tokens["csrf_token"]
+                    self._app_session = tokens["app_session"]
+                return await self.async_step_reauth_mfa()
+            except RivianAuthError:
+                errors["base"] = "invalid_auth"
+            except aiohttp.ClientError:
+                errors["base"] = "cannot_connect"
+
+        suggested_email = (
+            self._reauth_entry.data.get(CONF_EMAIL, "") if self._reauth_entry else ""
+        )
+        return self.async_show_form(
+            step_id="reauth_confirm",
+            data_schema=vol.Schema({
+                vol.Required(CONF_EMAIL, default=suggested_email): str,
+                vol.Required(CONF_PASSWORD): str,
+            }),
+            errors=errors,
+        )
+
+    async def async_step_reauth_mfa(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        errors: dict[str, str] = {}
+
+        if user_input is not None:
+            try:
+                async with aiohttp.ClientSession() as http:
+                    client = RivianClient(http)
+                    client.restore_session(self._csrf_token, self._app_session, "")
+                    await client.login_with_otp(
+                        self._email, user_input["otp_code"], self._otp_token
+                    )
+                    tokens = client.get_session_tokens()
+                    self._csrf_token = tokens["csrf_token"]
+                    self._app_session = tokens["app_session"]
+                    self._user_session = tokens["user_session"]
+                    self._refresh_token = tokens["refresh_token"]
+                return self.async_update_reload_and_abort(
+                    self._reauth_entry,
+                    data={
+                        **self._reauth_entry.data,
+                        CONF_EMAIL: self._email,
+                        CONF_PASSWORD: self._password,
+                        CONF_CSRF_TOKEN: self._csrf_token,
+                        CONF_APP_SESSION: self._app_session,
+                        CONF_USER_SESSION: self._user_session,
+                        CONF_REFRESH_TOKEN: self._refresh_token,
+                    },
+                )
+            except RivianAuthError:
+                errors["base"] = "invalid_otp"
+            except aiohttp.ClientError:
+                errors["base"] = "cannot_connect"
+
+        return self.async_show_form(
+            step_id="reauth_mfa",
+            data_schema=vol.Schema({vol.Required("otp_code"): str}),
+            description_placeholders={"email": self._email},
             errors=errors,
         )
 

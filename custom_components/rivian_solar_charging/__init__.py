@@ -5,7 +5,7 @@ import logging
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .const import (
@@ -51,9 +51,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         except RivianAuthError as err:
             raise ConfigEntryNotReady(f"Rivian auth failed: {err}") from err
 
-    coordinator = SolarChargingCoordinator(hass, client, {**entry.data, **entry.options})
+    coordinator = SolarChargingCoordinator(
+        hass, client, {**entry.data, **entry.options}, config_entry=entry
+    )
 
-    # After first successful API call, persist any refreshed tokens
+    # Persist tokens immediately whenever a silent refresh succeeds mid-run,
+    # so a HA restart doesn't lose the new refresh token.
+    client.set_tokens_refreshed_callback(lambda: _persist_tokens(hass, entry, client))
+
+    # After first successful API call, persist any refreshed tokens.
+    # ConfigEntryAuthFailed propagates naturally here — HA will trigger reauth.
     await coordinator.async_config_entry_first_refresh()
     _persist_tokens(hass, entry, client)
 

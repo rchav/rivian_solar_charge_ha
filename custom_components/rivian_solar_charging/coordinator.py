@@ -19,6 +19,7 @@ from datetime import datetime, timedelta
 from enum import Enum
 from typing import Any
 
+from homeassistant.components import persistent_notification
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import UnitOfPower
 from homeassistant.core import HomeAssistant
@@ -218,6 +219,22 @@ class SolarChargingCoordinator(DataUpdateCoordinator):
         try:
             vstate = await self.rivian.get_vehicle_state(vehicle_id)
         except RivianAuthError as err:
+            # Silent refresh (via the stored refresh token) already happened
+            # and failed inside get_vehicle_state — only a full re-login
+            # (possibly with a new OTP) can recover from here, so flag it
+            # somewhere the user will actually notice, not just the easy-to-
+            # miss "Reauthenticate" badge on the integration card.
+            persistent_notification.async_create(
+                self.hass,
+                (
+                    "Your Rivian session expired and could not be renewed "
+                    "automatically. Go to Settings -> Devices & Services -> "
+                    "Rivian Solar Charging and re-authenticate (you may be "
+                    "asked for your one-time passcode)."
+                ),
+                title="Rivian Solar Charging - Reauthentication Required",
+                notification_id=f"{DOMAIN}_reauth_{self.config_entry.entry_id}",
+            )
             raise ConfigEntryAuthFailed(f"Rivian session expired: {err}") from err
         except Exception as err:  # noqa: BLE001
             raise UpdateFailed(f"Rivian API error: {err}") from err

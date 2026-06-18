@@ -9,6 +9,7 @@ import aiohttp
 import voluptuous as vol
 
 from homeassistant import config_entries
+from homeassistant.components import persistent_notification
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector
@@ -227,6 +228,9 @@ class RivianSolarChargingConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     self._app_session = tokens["app_session"]
                     self._user_session = tokens["user_session"]
                     self._refresh_token = tokens["refresh_token"]
+                persistent_notification.async_dismiss(
+                    self.hass, f"{DOMAIN}_reauth_{self._reauth_entry.entry_id}"
+                )
                 return self.async_update_reload_and_abort(
                     self._reauth_entry,
                     data={
@@ -283,6 +287,9 @@ class RivianSolarChargingConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     self._app_session = tokens["app_session"]
                     self._user_session = tokens["user_session"]
                     self._refresh_token = tokens["refresh_token"]
+                persistent_notification.async_dismiss(
+                    self.hass, f"{DOMAIN}_reauth_{self._reauth_entry.entry_id}"
+                )
                 return self.async_update_reload_and_abort(
                     self._reauth_entry,
                     data={

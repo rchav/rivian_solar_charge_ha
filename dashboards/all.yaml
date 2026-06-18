@@ -1000,6 +1000,9 @@ views:
                   - condition: user
                     users:
                       - 648bf1805d0d45c998b763690aa98813
+              - type: tile
+                entity: button.rivian_solar_charging_force_sync
+                name: Force Sync
           - type: entities
             title: Detail
             visibility:

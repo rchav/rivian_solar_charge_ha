@@ -22,7 +22,7 @@ from .rivian_client import RivianAuthError, RivianMFARequired, RivianClient
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS = ["sensor", "switch"]
+PLATFORMS = ["sensor", "switch", "button"]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
